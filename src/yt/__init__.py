@@ -87,7 +87,6 @@ class Ui(object):
                 ('1-9', 'choose'),
                 ('v', 'choose index'),
                 ('u', 'user'),
-                ('o', 'ordering'),
         ]
 
         # Create the windows
