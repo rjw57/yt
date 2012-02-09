@@ -27,6 +27,9 @@ class Ui(object):
         # A cache of the last feed result
         self._last_feed = None
 
+        # The ordering
+        self._ordering = 'relevance'
+
         # Specify the current feed
         if len(sys.argv) > 1:
             self._feed = search(' '.join(sys.argv[1:]))
@@ -35,6 +38,14 @@ class Ui(object):
 
         # The items to display in the pager
         self._items = None
+
+        # A mapping between ordering name and human-name
+        self._ordering_names = {
+            'relevance': 'relvance',
+            'viewCount': 'view count',
+            'published': 'publication date',
+            'rating': 'rating',
+        }
 
     def run(self):
         # Get the locale encoding
@@ -70,11 +81,11 @@ class Ui(object):
 
         self._status = ''
         self._help = [
-                ('n', 'next'),
-                ('p', 'prev'),
+                ('[/]', 'prev/next'),
+                ('o', 'ordering'),
                 ('s', 'search'),
-                ('1-9', 'play'),
-                ('v', 'select'),
+                ('1-9', 'choose'),
+                ('v', 'choose index'),
                 ('u', 'user'),
         ]
 
@@ -127,7 +138,7 @@ class Ui(object):
             and int(self._last_feed['data']['startIndex']) == start:
                 return self._last_feed
         self._show_message(u'Talking to YouTube\u2026')
-        self._last_feed = self._feed['fetch_cb'](start, count)
+        self._last_feed = self._feed['fetch_cb'](start, count, self._ordering)
         return self._last_feed
 
     def _update_screen(self):
@@ -173,17 +184,20 @@ class Ui(object):
             else:
                 self._status = 'No results for %s' % (self._feed['description'],)
 
+            if self._ordering in self._ordering_names:
+                self._status += ' ordered by ' + self._ordering_names[self._ordering]
+
             # Update the screen with the new items
             self._update_screen()
 
             c = self._main_win.getch()
             if c == ord('q'): # quit
                 break
-            elif c == ord('n'): # next
+            elif c == ord(']'): # next
                 # have we had all the items?
                 if not 'data' in self._last_feed or not 'totalItems' in self._last_feed['data'] or len(self._items) + idx < self._last_feed['data']['totalItems']:
                     idx += n_per_page
-            elif c == ord('p'): # previous
+            elif c == ord('['): # previous
                 if idx > n_per_page:
                     idx -= n_per_page
                 else:
@@ -193,6 +207,7 @@ class Ui(object):
                 if s is not None and len(s) > 0:
                     self._feed = search(s)
                     self._last_feed = None
+                    self._ordering = 'relevance'
                     idx = 0
             elif c == ord('v'): # video
                 s = self._input('number')
@@ -206,9 +221,28 @@ class Ui(object):
                 if s is not None:
                     self._feed = user(s)
                     self._last_feed = None
+                    self._ordering = 'published'
                     idx = 0
             elif c >= ord('1') and c <= ord('9'): # specific video
                 self._play_video(c - ord('1'))
+            elif c == ord('o'): # ordering
+                self._show_message('Order by: (v)iew count, (r)elevance, (p)ublication date or ra(t)ing?')
+                oc = self._main_win.getch()
+                self._ordering = None
+                
+                while self._ordering is None:
+                    if oc == ord('r'):
+                        self._ordering = 'relevance'
+                    elif oc == ord('v'):
+                        self._ordering = 'viewCount'
+                    elif oc == ord('p'):
+                        self._ordering = 'published'
+                    elif oc == ord('t'):
+                        self._ordering = 'rating'
+
+                self._last_feed = None
+                idx = 0
+
 
     def _play_video(self, idx):
         # idx is 0-based(!)
@@ -331,7 +365,7 @@ def play_url(url):
     mplayer.wait()
 
 def search(terms):
-    def fetch_cb(start=1, maxresults=25):
+    def fetch_cb(start, maxresults, ordering):
         url = 'https://gdata.youtube.com/feeds/api/videos'
         query = {
             'q': terms,
@@ -339,32 +373,35 @@ def search(terms):
             'alt': 'jsonc',
             'start-index': start,
             'max-results': maxresults,
+            'orderby': ordering,
         }
         return json.load(urllib2.urlopen('%s?%s' % (url, urllib.urlencode(query))))
 
     return { 'fetch_cb': fetch_cb, 'description': 'search for "%s"' % (terms,) }
 
 def user(username):
-    def fetch_cb(start=1, maxresults=25):
+    def fetch_cb(start, maxresults, ordering):
         url = 'https://gdata.youtube.com/feeds/api/users/%s/uploads' % (username,)
         query = {
             'v': 2,
             'alt': 'jsonc',
             'start-index': start,
             'max-results': maxresults,
+            'orderby': ordering,
         }
         return json.load(urllib2.urlopen('%s?%s' % (url, urllib.urlencode(query))))
 
     return { 'fetch_cb': fetch_cb, 'description': 'uploads by "%s"' % (username,) }
 
 def standard_feed(feed_name):
-    def fetch_cb(start=1, maxresults=25):
+    def fetch_cb(start, maxresults, ordering):
         url = 'https://gdata.youtube.com/feeds/api/standardfeeds/%s' % (feed_name,)
         query = {
             'v': 2,
             'alt': 'jsonc',
             'start-index': start,
             'max-results': maxresults,
+            'orderby': ordering,
         }
         return json.load(urllib2.urlopen('%s?%s' % (url, urllib.urlencode(query))))
 
