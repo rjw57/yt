@@ -246,6 +246,12 @@ class Ui(object):
         title = item['title']
         uploader = item['uploader']
 
+        likes = int(item['likeCount']) if 'likeCount' in item else 0
+        ratings = int(item['ratingCount']) if 'ratingCount' in item else 0
+        comments = int(item['commentCount']) if 'commentCount' in item else 0
+        views = int(item['viewCount']) if 'viewCount' in item else 0
+        favorites = int(item['favoriteCount']) if 'favoriteCount' in item else 0
+
         # Show the title and uploader, prioritising the title
         if len(uploader) > w:
             self._main_win.addstr(y,x,truncate(title, w).encode(self._code), self._title_attr)
@@ -258,12 +264,6 @@ class Ui(object):
             desc = 'No description'
         desc = re.sub(r'[\n\r]', r' ', desc)
         self._main_win.addstr(y+1,x,truncate(desc, w).encode(self._code), curses.color_pair(2))
-        info_str = 'dur: %s, views: %s' % (duration(item['duration']), item['viewCount'])
-        likes = int(item['likeCount']) if 'likeCount' in item else 0
-        ratings = int(item['ratingCount']) if 'ratingCount' in item else 0
-        comments = int(item['commentCount']) if 'commentCount' in item else 0
-        views = int(item['viewCount']) if 'viewCount' in item else 0
-        favorites = int(item['favoriteCount']) if 'favoriteCount' in item else 0
         self._add_table_row([
                 ('d', duration(item['duration'])),
                 ('v', number(views)),
