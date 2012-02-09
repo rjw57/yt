@@ -206,6 +206,7 @@ class Ui(object):
                 if s is not None:
                     self._feed = user(s)
                     self._last_feed = None
+                    idx = 0
             elif c >= ord('1') and c <= ord('9'): # specific video
                 self._play_video(c - ord('1'))
 
