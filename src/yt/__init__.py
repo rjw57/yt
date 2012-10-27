@@ -53,7 +53,7 @@ class Ui(object):
 
         # A mapping between ordering name and human-name
         self._ordering_names = {
-            'relevance': 'relvance',
+            'relevance': 'relevance',
             'viewCount': 'view count',
             'published': 'publication date',
             'rating': 'rating',
