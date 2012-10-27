@@ -10,9 +10,21 @@ import subprocess
 import sys
 import urllib
 import urllib2
+import argparse
+
+# Define possible player modes.
+MPLAYER_MODE="mplayer"
+OMXPLAYER_MODE="omxplayer"
 
 def main():
-    ui = Ui()
+
+    # Allow the user to specify whether to use mplayer or omxplayer for playing videos.
+    parser = argparse.ArgumentParser(prog='yt',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--player",default=MPLAYER_MODE,choices=[MPLAYER_MODE,OMXPLAYER_MODE],help="specifies what program to use to play videos")
+   
+    args = parser.parse_args(sys.argv[1:])
+
+    ui = Ui(args.player)
     ui.run()
 
 class ScreenSizeError(Exception):
@@ -23,7 +35,7 @@ class ScreenSizeError(Exception):
         return m
 
 class Ui(object):
-    def __init__(self):
+    def __init__(self,player):
         # A cache of the last feed result
         self._last_feed = None
 
@@ -31,10 +43,10 @@ class Ui(object):
         self._ordering = 'relevance'
 
         # Specify the current feed
-        if len(sys.argv) > 1:
-            self._feed = search(' '.join(sys.argv[1:]))
-        else:
-            self._feed = standard_feed('most_viewed')
+        # if len(sys.argv) > 1:
+        #    self._feed = search(' '.join(sys.argv[1:]))
+        #else:
+        self._feed = standard_feed('most_viewed')
 
         # The items to display in the pager
         self._items = None
@@ -46,6 +58,9 @@ class Ui(object):
             'published': 'publication date',
             'rating': 'rating',
         }
+        
+        # Which player to use for playing videos.
+        self._player = player
 
     def run(self):
         # Get the locale encoding
@@ -251,7 +266,7 @@ class Ui(object):
         item = self._items[idx]
         url = item['player']['default']
         self._show_message('Playing ' + url)
-        play_url(url)
+        play_url(url,self._player)
 
     def _show_video_items(self, items):
         # Get size of window and maximum number of items per page
@@ -353,16 +368,30 @@ def number(n):
         return '%.1fk' % (n/1000.0,)
     return '%.1fM' % (n//1000000.0,)
 
-def play_url(url):
+def play_url(url,player):
     yt_dl = subprocess.Popen(['youtube-dl', '-g', url], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     (url, err) = yt_dl.communicate()
     if yt_dl.returncode != 0:
         sys.stderr.write(err)
         raise RuntimeError('Error getting URL.')
-    mplayer = subprocess.Popen(
+
+    assert player in [MPLAYER_MODE,OMXPLAYER_MODE]
+    if player == MPLAYER_MODE:
+        play_url_mplayer(url)
+    else:
+        play_url_omxplayer(url)
+    
+def play_url_mplayer(url):
+    player = subprocess.Popen(
             ['mplayer', '-quiet', '-fs', '--', url.decode('UTF-8').strip()],
             stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-    mplayer.wait()
+    player.wait()
+        
+def play_url_omxplayer(url):
+    player = subprocess.Popen(
+            ['omxplayer', '-ohdmi', url.decode('UTF-8').strip()],
+            stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    player.wait()
 
 def search(terms):
     def fetch_cb(start, maxresults, ordering):
@@ -412,3 +441,7 @@ def standard_feed(feed_name):
 
     return feed
 
+# Make it easy to run module by itself without using external tools to deploy it and
+# create additional launch scripts.
+if __name__ == "__main__":
+    main()
