@@ -15,7 +15,7 @@ install_requires = [
 ]
 
 
-setup(name='yt',
+setup(name='whitey',
     version=version,
     description="Command-line YouTube client",
     long_description=README + '\n\n' + NEWS,
