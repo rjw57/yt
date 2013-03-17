@@ -17,7 +17,7 @@ Launch using ``mplayer`` with::
 
 or, if you're using a Raspberry Pi, using ``omxplayer``::
 
-    yt --player omxplayer
+    pi-yt
 
 Installation
 ------------
