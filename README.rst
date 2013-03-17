@@ -8,6 +8,17 @@ videos and play them directly from the command-line. It uses ``youtube-dl`` and
 The combination of a text based interface and ``omxplayer`` makes ``yt`` a great
 YouTube client for the Raspberry Pi.
 
+Usage
+-----
+
+Launch using ``mplayer`` with::
+
+    yt
+
+or, if you're using a Raspberry Pi, using ``omxplayer``::
+
+    yt --player omxplayer
+
 Installation
 ------------
 
