@@ -17,6 +17,9 @@ MPLAYER_MODE="mplayer"
 OMXPLAYER_MODE="omxplayer"
 
 def main():
+    """
+    Launch yt, allowing user to specify player.
+    """
 
     # Allow the user to specify whether to use mplayer or omxplayer for playing videos.
     parser = argparse.ArgumentParser(prog='yt',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -25,6 +28,16 @@ def main():
     args = parser.parse_args(sys.argv[1:])
 
     ui = Ui(args.player)
+    ui.run()
+
+def main_with_omxplayer():
+    """
+    Launch yt, using omxplayer.
+    """
+
+    parser = argparse.ArgumentParser(prog='pi-yt')
+
+    ui = Ui(OMXPLAYER_MODE)
     ui.run()
 
 class ScreenSizeError(Exception):

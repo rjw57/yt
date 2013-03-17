@@ -33,6 +33,9 @@ setup(name='whitey',
     install_requires=install_requires,
     entry_points={
         'console_scripts':
-            ['yt=yt:main']
+            [
+                'yt=yt:main',
+                'pi-yt=yt:main_with_omxplayer'
+            ]
     }
 )
