@@ -51,19 +51,6 @@ From GitHub
     git checkout git@github.com:rjw57/yt.git
     cd yt
     sudo python setup.py install
-
-Usage
------
-
-::
-
-    usage: yt [-h] [--player {mplayer,omxplayer}]
-
-    optional arguments:
-      -h, --help            show this help message and exit
-      --player {mplayer,omxplayer}
-                            specifies what program to use to play videos (default:
-                        mplayer)
                         
 Dependancies
 ------------
