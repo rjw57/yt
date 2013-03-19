@@ -6,7 +6,7 @@ README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.2'
+version = '0.3'
 
 install_requires = [
     # List your project dependencies here.
@@ -33,6 +33,9 @@ setup(name='whitey',
     install_requires=install_requires,
     entry_points={
         'console_scripts':
-            ['yt=yt:main']
+            [
+                'yt=yt:main',
+                'pi-yt=yt:main_with_omxplayer'
+            ]
     }
 )
