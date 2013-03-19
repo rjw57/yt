@@ -6,18 +6,18 @@
 News
 ====
 
-0.2
------
+0.3 - not yet released
+----------------------
 
-*Release date: 29-Oct-2012*
-
-* Allow command-line configuration of media player (Calum Eadie)
+* Added pi-yt entry point (Calum Eadie)
 
 
-0.1
----
+0.2 - 29/10/2012
+----------------
 
-*Release date: 29-Feb-2012*
+* Added command-line configuration of media player (Calum Eadie)
+
+0.1 - 29/02/2012
+----------------
 
 * Initial version
-
