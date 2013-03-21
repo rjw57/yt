@@ -51,6 +51,13 @@ From GitHub
     git checkout git@github.com:rjw57/yt.git
     cd yt
     sudo python setup.py install
+
+One line install
+~~~~~~~~~~~~~~~~
+
+::
+
+    curl -L https://github.com/rjw57/yt/raw/master/tools/install.sh | sh
                         
 Dependancies
 ------------
