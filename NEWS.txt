@@ -15,7 +15,7 @@ News
 0.2 - 29/10/2012
 ----------------
 
-* Added command-line configuration of media player (Calum Eadie)
+* Added command-line configuration of media player and OMXPlayer support (Calum Eadie)
 
 0.1 - 29/02/2012
 ----------------

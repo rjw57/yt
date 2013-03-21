@@ -106,7 +106,7 @@ Contributors
     - Created ``yt``.
 
 - Calum J. Eadie
-    - Added OMXPlayer support.
+    - Added OMXPlayer support and pi-yt entry point.
 
 Credits
 -------
