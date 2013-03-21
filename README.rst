@@ -52,8 +52,8 @@ From GitHub
     cd yt
     sudo python setup.py install
 
-One line install on the Raspberry Pi
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+One line install for the Raspberry Pi
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
