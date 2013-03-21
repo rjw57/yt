@@ -8,8 +8,8 @@
 #   
 # Usage:
 # 
-# curl -L https://github.com/rjw57/yt/raw/master/tools/install.sh | sh
-# wget --no-check-certificate https://github.com/rjw57/yt/raw/master/tools/install.sh -O - | sh
+# curl -L https://github.com/rjw57/yt/raw/master/tools/install-pi.sh | sh
+# wget --no-check-certificate https://github.com/rjw57/yt/raw/master/tools/install-pi.sh -O - | sh
 
 echo "[yt installer] Installing programs to be able to download YouTube videos and to play them."
 sudo apt-get install omxplayer youtube-dl

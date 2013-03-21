@@ -52,12 +52,12 @@ From GitHub
     cd yt
     sudo python setup.py install
 
-One line install
-~~~~~~~~~~~~~~~~
+One line install on the Raspberry Pi
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-    curl -L https://github.com/rjw57/yt/raw/master/tools/install.sh | sh
+    curl -L https://github.com/rjw57/yt/raw/master/tools/install-pi.sh | sh
                         
 Dependancies
 ------------
