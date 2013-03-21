@@ -92,6 +92,14 @@ Getting more help
 See https://github.com/rg3/youtube-dl and https://github.com/huceke/omxplayer for
 more detailed help.
 
+Contributors
+------------
+
+- Rich Wareham
+    - Created ``yt``.
+
+- Calum J. Eadie
+    - Added OMXPlayer support.
 
 Credits
 -------
