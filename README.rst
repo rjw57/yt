@@ -102,7 +102,7 @@ Credits
 - `youtube-dl`_
 - `mplayer`_
 - `Omxplayer`_
-- Mark Baldridges's "HOWTO: YouTube on the Raspberry Pi - sans X)" - http://www.raspberrypi.org/phpBB3/viewtopic.php?p=97710&sid=fa3272a732353dc501cb96d38453b97c#p97710
+- Mark Baldridges's `"HOWTO: YouTube on the Raspberry Pi - sans X)"`_
 
 .. _Buildout: http://www.buildout.org/
 .. _Distribute: http://pypi.python.org/pypi/distribute
@@ -110,3 +110,4 @@ Credits
 .. _`youtube-dl`: http://rg3.github.com/youtube-dl/
 .. _`mplayer`: http://www.mplayerhq.hu/
 .. _`Omxplayer`: https://github.com/huceke/omxplayer
+.. _`"HOWTO: YouTube on the Raspberry Pi - sans X)"`: http://www.raspberrypi.org/phpBB3/viewtopic.php?p=97710&sid=fa3272a732353dc501cb96d38453b97c#p97710
