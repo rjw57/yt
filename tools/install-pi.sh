@@ -19,7 +19,7 @@ sudo youtube-dl -U
 
 echo "[yt installer] Installing yt."
 sudo apt-get install python-setuptools
-sudo easy_install whitey
+sudo easy_install --upgrade whitey
 
 echo "[yt_installer] Starting yt!"
 pi-yt
