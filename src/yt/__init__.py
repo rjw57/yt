@@ -23,11 +23,13 @@ def main():
 
     # Allow the user to specify whether to use mplayer or omxplayer for playing videos.
     parser = argparse.ArgumentParser(prog='yt',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    
     parser.add_argument("--player",default=MPLAYER_MODE,choices=[MPLAYER_MODE,OMXPLAYER_MODE],help="specifies what program to use to play videos")
+    parser.add_argument("--novideo", default=0, action='store_true', help="Play selection while suppressing video e.g. Audio only")
    
     args = parser.parse_args(sys.argv[1:])
 
-    ui = Ui(args.player)
+    ui = Ui(args)
     ui.run()
 
 def main_with_omxplayer():
@@ -48,7 +50,8 @@ class ScreenSizeError(Exception):
         return m
 
 class Ui(object):
-    def __init__(self,player):
+    def __init__(self,args):
+        
         # A cache of the last feed result
         self._last_feed = None
 
@@ -73,7 +76,9 @@ class Ui(object):
         }
         
         # Which player to use for playing videos.
-        self._player = player
+        self._player = args.player
+        
+        self._novideo = args.novideo
 
     def run(self):
         # Get the locale encoding
@@ -279,7 +284,7 @@ class Ui(object):
         item = self._items[idx]
         url = item['player']['default']
         self._show_message('Playing ' + url)
-        play_url(url,self._player)
+        play_url(url,self._player,self._novideo)
 
     def _show_video_items(self, items):
         # Get size of window and maximum number of items per page
@@ -381,7 +386,8 @@ def number(n):
         return '%.1fk' % (n/1000.0,)
     return '%.1fM' % (n//1000000.0,)
 
-def play_url(url,player):
+def play_url(url,player,novideo):
+    
     yt_dl = subprocess.Popen(['youtube-dl', '-g', url], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     (url, err) = yt_dl.communicate()
     if yt_dl.returncode != 0:
@@ -390,13 +396,19 @@ def play_url(url,player):
 
     assert player in [MPLAYER_MODE,OMXPLAYER_MODE]
     if player == MPLAYER_MODE:
-        play_url_mplayer(url)
+        play_url_mplayer(url,novideo)
     else:
         play_url_omxplayer(url)
     
-def play_url_mplayer(url):
-    player = subprocess.Popen(
-            ['mplayer', '-quiet', '-fs', '--', url.decode('UTF-8').strip()],
+def play_url_mplayer(url,novideo):
+  
+    if novideo:
+      player = subprocess.Popen(
+            ['mplayer', '-quiet', '-novideo', '--', url.decode('UTF-8').strip()],
+            stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    else:
+      player = subprocess.Popen(
+            ['mplayer', '-quiet', '', '--', url.decode('UTF-8').strip()],
             stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     player.wait()
         
