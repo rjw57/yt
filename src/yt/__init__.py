@@ -12,6 +12,8 @@ import urllib
 import urllib2
 import argparse
 
+import os
+
 # Define possible player modes.
 MPLAYER_MODE="mplayer"
 OMXPLAYER_MODE="omxplayer"
@@ -25,10 +27,11 @@ def main():
     parser = argparse.ArgumentParser(prog='yt',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
     parser.add_argument("--player",default=MPLAYER_MODE,choices=[MPLAYER_MODE,OMXPLAYER_MODE],help="specifies what program to use to play videos")
-    parser.add_argument("--novideo", default=0, action='store_true', help="Play selection while suppressing video e.g. Audio only")
+    parser.add_argument("--novideo", default=False, action='store_true', help="Play selection while suppressing video e.g. Audio only NOTE: This flag is ignored when using omxplayer")
    
     args = parser.parse_args(sys.argv[1:])
 
+    # We are now passing all arguments to the Ui object instead of just the player choice. This allows adding new options.
     ui = Ui(args)
     ui.run()
 
@@ -78,6 +81,7 @@ class Ui(object):
         # Which player to use for playing videos.
         self._player = args.player
         
+        # Do we want to display video or just audio.
         self._novideo = args.novideo
 
     def run(self):
@@ -388,11 +392,17 @@ def number(n):
 
 def play_url(url,player,novideo):
     
-    yt_dl = subprocess.Popen(['youtube-dl', '-g', url], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-    (url, err) = yt_dl.communicate()
-    if yt_dl.returncode != 0:
-        sys.stderr.write(err)
-        raise RuntimeError('Error getting URL.')
+    if novideo:
+      #'subprocess.Popen' is not calling youtube-dl properly when using '-f' flag, so here we are using 'os.popen'
+      call = "youtube-dl -g -f 17/5/18/43 " + url
+      url = os.popen(call).read()
+    else:
+      yt_dl = subprocess.Popen(['youtube-dl', '-g', url], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+      (url, err) = yt_dl.communicate()
+        
+      if yt_dl.returncode != 0:
+          sys.stderr.write(err)
+          raise RuntimeError('Error getting URL.')
 
     assert player in [MPLAYER_MODE,OMXPLAYER_MODE]
     if player == MPLAYER_MODE:
