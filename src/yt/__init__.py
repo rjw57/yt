@@ -28,7 +28,8 @@ def main():
     
     parser.add_argument("--player",default=MPLAYER_MODE,choices=[MPLAYER_MODE,OMXPLAYER_MODE],help="specifies what program to use to play videos")
     parser.add_argument("--novideo", default=False, action='store_true', help="Play selection while suppressing video e.g. Audio only NOTE: This flag is ignored when using omxplayer")
-   
+    parser.add_argument("--bandwidth", help="Choose prefered minimum video quality. This value will be prefered video quality and will increment up if chosen setting is unavailable. Example: \"--bandwidth 5\" will try and use codec #5 (240p) and if unavailable, will step up to codec #18 (270p/360p). Valid choices from low to high are \"17, 5, 18, 43\"", type=int)
+    
     args = parser.parse_args(sys.argv[1:])
 
     # We are now passing all arguments to the Ui object instead of just the player choice. This allows adding new options.
@@ -83,6 +84,15 @@ class Ui(object):
         
         # Do we want to display video or just audio.
         self._novideo = args.novideo
+        
+        # Setting a bandwidth preference order
+        if args.bandwidth:
+            bandwidth_order = ["17","/","5","/","18","/","43"]
+            arg_position = bandwidth_order.index(str(args.bandwidth))
+            bandwidth_order_string = ''.join(bandwidth_order[arg_position:])
+            self._bandwidth = bandwidth_order_string
+        else:
+            self._bandwidth = None
 
     def run(self):
         # Get the locale encoding
@@ -288,7 +298,7 @@ class Ui(object):
         item = self._items[idx]
         url = item['player']['default']
         self._show_message('Playing ' + url)
-        play_url(url,self._player,self._novideo)
+        play_url(url,self._player,self._novideo,self._bandwidth)
 
     def _show_video_items(self, items):
         # Get size of window and maximum number of items per page
@@ -390,11 +400,15 @@ def number(n):
         return '%.1fk' % (n/1000.0,)
     return '%.1fM' % (n//1000000.0,)
 
-def play_url(url,player,novideo):
+def play_url(url,player,novideo,bandwidth):
     
-    if novideo:
+    if bandwidth:
       #'subprocess.Popen' is not calling youtube-dl properly when using '-f' flag, so here we are using 'os.popen'
-      call = "youtube-dl -g -f 17/5/18/43 " + url
+      call = "youtube-dl -g -f " + bandwidth + " " + url
+      url = os.popen(call).read()
+    elif novideo:
+      #Choosing a low bitrate codec since we will be dropping the video anyway
+      call = "youtube-dl -g -f " + "5/18/43 " + url
       url = os.popen(call).read()
     else:
       yt_dl = subprocess.Popen(['youtube-dl', '-g', url], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
