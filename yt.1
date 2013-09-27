@@ -1,0 +1,66 @@
+.TH YT "1"
+.SH NAME
+.PP
+yt \- a command\-line youtube client
+.SH SYNOPSIS
+.PP
+\f[B]yt\f[] [OPTION]...
+.SH DESCRIPTION
+.PP
+yt is a command\-line front\-end to YouTube which allows you to
+browse YouTube videos and play them directly from the command\-line. It
+uses youtube\-dl and mplayer or omxplayer to actually play the videos. The
+combination of a text based interface and omxplayer makes yt a great
+YouTube client for the Raspberry Pi.
+.SH OPTIONS
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+                        print this help text and exit
+.TP
+\fB\-\-player\fR {mplayer,omxplayer}
+                        specifies what program to use to play videos (default: mplayer)
+.TP
+\fB\-\-novideo\fR
+                        Play selection while suppressing video e.g. Audio only
+                        NOTE: This flag is ignored when using omxplayer (default: False)
+.TP
+\fB\-\-bandwidth\fR\ BANDWIDTH
+                        Choose prefered minimum video quality. This value will be prefered
+                        be prefered video quality and will increment up if chosen setting
+                        is unavailable.  Example: "--bandwidth 5" will try and use codec
+                        #5 (240p) and if unavailable, will step up to codec #18 (270p/360p).
+                        Valid choices from low to high are "17, 5, 18, 43" (default: None)
+.SH FAQ
+.PP
+\fBVideos don't play when selected in interface\fR
+
+Make sure you have the latest version of youtube-dl. youtube-dl has a self update mechanism:
+\fBsudo youtube-dl -U\fR
+
+\fBOmxplayer starts and terminates without playing video\fR
+
+For high quality videos the default memory allocation on the Raspberry Pi doesn't provide enough memory to the GPU.
+The default 192M ARM, 64M GPU split can be changed to a 128M ARM, 128M GPU split using raspi-config.
+\fBsudo raspi-config\fR
+# Select memory-split
+# Allocate 128M to the GPU
+See \fBhttp://elinux.org/RPi_Advanced_Setup\fR for more information.
+.SH BUGS
+.PP
+Bugs and suggestions should be reported at:
+<https://github.com/rjw57/yt/issues>
+.SH COPYRIGHT
+.PP
+yt is released into license here by the copyright holders.
+.PP
+This README file was originally written by Rich Wareham
+(<https://github.com/rjw57>) and is likewise released into license here.
+.SH AUTHOR
+Initial coding, and main maintenance is done by
+Rich Wareham <rjw57@cantab.net>.
+
+The homepage is available at
+.B "\%https://github.com/rjw57/yt"
+.SH SEE ALSO
+.BR "youtube-dl" "(1), "
+.BR "mplayer" "(5)"
