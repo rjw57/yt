@@ -1,0 +1,56 @@
+#bash completion for yt
+
+_yt()
+{
+    #When the function or command is invoked, the first argument is the name of
+    #the command whose arguments are being completed, the second argument is the
+    #word being completed, and the third argument is the word preceding the word
+    #being  completed on  the current command line.
+
+    #program_name=$1
+    #cur=$2
+    #prev=$3
+
+    #defining local vars
+    local cur prev opts
+    COMPREPLY=() #clean out last completions
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    OPTS="-h --help --player --novideo --bandwidth"
+
+    #=======================================================
+    #                   Nested options <1st layer>
+    #=======================================================
+    player_opts="mplayer omxplayer"
+
+    ########################################################
+    # -W wordlist
+    # -A action (see bash 'complete' build-in command)
+    # -G globalpath
+    # -C command
+    # -F function
+    # -X filterpath
+    # -P preffix
+    # -S suffix
+
+    case "${prev}" in
+         ##1st layer
+         --player)
+            COMPREPLY=( $( compgen -W "$player_opts" -- $cur ))
+            return 0
+            ;;
+    esac
+
+    #general options
+    case "${cur}" in
+        -*)
+            COMPREPLY=( $( compgen -W "$OPTS" -- $cur ))
+            ;;
+        *)
+            COMPREPLY=( $( compgen -W "$OPTS" -- $cur ))
+            ;;
+    esac
+}
+
+complete -F _yt yt
