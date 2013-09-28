@@ -134,6 +134,7 @@ class Ui(object):
                 ('1-9', 'choose'),
                 ('v', 'choose index'),
                 ('u', 'user'),
+                ('n', 'toggle novideo'),
         ]
 
         # Create the windows
@@ -234,6 +235,9 @@ class Ui(object):
             if self._ordering in self._ordering_names:
                 self._status += ' ordered by ' + self._ordering_names[self._ordering]
 
+            if self._novideo:
+                self._status += ' [no video]'
+
             # Update the screen with the new items
             self._update_screen()
 
@@ -289,6 +293,8 @@ class Ui(object):
 
                 self._last_feed = None
                 idx = 0
+            elif c == ord('n'): # toggle novideo
+                self._novideo = not self._novideo
 
 
     def _play_video(self, idx):
