@@ -438,7 +438,7 @@ def play_url_mplayer(url,novideo):
         
 def play_url_omxplayer(url):
     player = subprocess.Popen(
-            ['omxplayer', '-ohdmi', url.decode('UTF-8').strip()],
+            ['omxplayer', '-ohdmi', '--blank', url.decode('UTF-8').strip()],
             stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     player.wait()
 
