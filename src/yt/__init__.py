@@ -265,7 +265,7 @@ class Ui(object):
                         pass
             elif c == ord('u'): # user
                 s = self._input('user')
-                if s is not None:
+                if s is not None and len(s) > 0:
                     self._feed = user(s)
                     self._last_feed = None
                     self._ordering = 'published'
