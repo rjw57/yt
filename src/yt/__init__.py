@@ -20,8 +20,8 @@ OMXPLAYER_MODE="omxplayer"
 
 def main():
     """
-Launch yt, allowing user to specify player.
-"""
+    Launch yt, allowing user to specify player.
+    """
 
     # Allow the user to specify whether to use mplayer or omxplayer for playing videos.
     parser = argparse.ArgumentParser(prog='yt',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -38,18 +38,18 @@ Launch yt, allowing user to specify player.
 
 def main_with_omxplayer():
     """
-Launch yt, using omxplayer.
-"""
+    Launch yt, using omxplayer.
+    """
 
     parser = argparse.ArgumentParser(prog='pi-yt')
 
     # Albert - November 23rd
     # Fixing broken pi-yt: Invoking the Ui passing parameters in the same way as it done from main()
     #
-    parser.add_argument ('--player', default=OMXPLAYER_MODE)
-    parser.add_argument ('--novideo', default=False)
-    parser.add_argument ('--bandwidth', type=int)
-    parser.add_argument ('--audio', default='local')
+    parser.add_argument('--player', default=OMXPLAYER_MODE)
+    parser.add_argument('--novideo', default=False)
+    parser.add_argument('--bandwidth', type=int)
+    parser.add_argument('--audio', default='local')
     args = parser.parse_args()
 
     ui = Ui(args)
