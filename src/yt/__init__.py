@@ -43,7 +43,16 @@ def main_with_omxplayer():
 
     parser = argparse.ArgumentParser(prog='pi-yt')
 
-    ui = Ui(OMXPLAYER_MODE)
+    # Albert - November 23rd
+    # Fixing broken pi-yt: Invoking the Ui passing parameters in the same way as it done from main()
+    #
+    parser.add_argument('--player', default=OMXPLAYER_MODE)
+    parser.add_argument('--novideo', default=False)
+    parser.add_argument('--bandwidth', type=int)
+    parser.add_argument('--audio', default='local')
+    args = parser.parse_args()
+
+    ui = Ui(args)
     ui.run()
 
 class ScreenSizeError(Exception):
@@ -64,7 +73,7 @@ class Ui(object):
 
         # Specify the current feed
         # if len(sys.argv) > 1:
-        #    self._feed = search(' '.join(sys.argv[1:]))
+        # self._feed = search(' '.join(sys.argv[1:]))
         #else:
         self._feed = standard_feed('most_viewed')
 
@@ -84,6 +93,10 @@ class Ui(object):
         
         # Do we want to display video or just audio.
         self._novideo = args.novideo
+
+        # Where do we want audio to go through? (RPi)
+        # "local" (analog device) or "hdmi".
+        self._audio = 'local'
         
         # Setting a bandwidth preference order
         if args.bandwidth:
@@ -304,7 +317,7 @@ class Ui(object):
         item = self._items[idx]
         url = item['player']['default']
         self._show_message('Playing ' + url)
-        play_url(url,self._player,self._novideo,self._bandwidth)
+        play_url(url,self._player,self._novideo,self._bandwidth,self._audio)
 
     def _show_video_items(self, items):
         # Get size of window and maximum number of items per page
@@ -406,7 +419,7 @@ def number(n):
         return '%.1fk' % (n/1000.0,)
     return '%.1fM' % (n//1000000.0,)
 
-def play_url(url,player,novideo,bandwidth):
+def play_url(url,player,novideo,bandwidth,audio):
     
     if bandwidth:
       #'subprocess.Popen' is not calling youtube-dl properly when using '-f' flag, so here we are using 'os.popen'
@@ -428,7 +441,7 @@ def play_url(url,player,novideo,bandwidth):
     if player == MPLAYER_MODE:
         play_url_mplayer(url,novideo)
     else:
-        play_url_omxplayer(url)
+        play_url_omxplayer(url,audio)
     
 def play_url_mplayer(url,novideo):
   
@@ -442,11 +455,15 @@ def play_url_mplayer(url,novideo):
             stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     player.wait()
         
-def play_url_omxplayer(url):
+def play_url_omxplayer(url,audio):
     player = subprocess.Popen(
-            ['omxplayer', '-ohdmi', '--blank', url.decode('UTF-8').strip()],
+            ['omxplayer', '-o%s' % audio, url.decode('UTF-8').strip()],
             stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     player.wait()
+
+    # fix black X screen after omxplayer playback
+    # http://elinux.org/Omxplayer#Black_screen_after_playback
+    os.system('xrefresh -display :0')
 
 def search(terms):
     def fetch_cb(start, maxresults, ordering):
