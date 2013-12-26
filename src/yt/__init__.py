@@ -17,6 +17,7 @@ import os
 # Define possible player modes.
 MPLAYER_MODE="mplayer"
 OMXPLAYER_MODE="omxplayer"
+MPV_MODE="mpv"
 
 def main():
     """
@@ -26,7 +27,7 @@ def main():
     # Allow the user to specify whether to use mplayer or omxplayer for playing videos.
     parser = argparse.ArgumentParser(prog='yt',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
-    parser.add_argument("--player",default=MPLAYER_MODE,choices=[MPLAYER_MODE,OMXPLAYER_MODE],help="specifies what program to use to play videos")
+    parser.add_argument("--player",default=MPLAYER_MODE,choices=[MPLAYER_MODE,OMXPLAYER_MODE,MPV_MODE],help="specifies what program to use to play videos")
     parser.add_argument("--novideo", default=False, action='store_true', help="Play selection while suppressing video e.g. Audio only NOTE: This flag is ignored when using omxplayer")
     parser.add_argument("--bandwidth", help="Choose prefered minimum video quality. This value will be prefered video quality and will increment up if chosen setting is unavailable. Example: \"--bandwidth 5\" will try and use codec #5 (240p) and if unavailable, will step up to codec #18 (270p/360p). Valid choices from low to high are \"17, 5, 18, 43\"", type=int)
     
@@ -420,7 +421,18 @@ def number(n):
     return '%.1fM' % (n//1000000.0,)
 
 def play_url(url,player,novideo,bandwidth,audio):
-    
+    assert player in [MPLAYER_MODE,OMXPLAYER_MODE,MPV_MODE]
+    if player == MPV_MODE:
+        # mpv can handle youtube URLs through quvi
+        play_url_mpv(url, novideo)
+    elif player == MPLAYER_MODE:
+        url = get_playable_url(url, novideo, bandwidth)
+        play_url_mplayer(url,novideo)
+    else:
+        url = get_playable_url(url, novideo, bandwidth)
+        play_url_omxplayer(url,audio)
+
+def get_playable_url(url, novideo, bandwidth):
     if bandwidth:
       #'subprocess.Popen' is not calling youtube-dl properly when using '-f' flag, so here we are using 'os.popen'
       call = "youtube-dl -g -f " + bandwidth + " " + url
@@ -432,17 +444,12 @@ def play_url(url,player,novideo,bandwidth,audio):
     else:
       yt_dl = subprocess.Popen(['youtube-dl', '-g', url], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
       (url, err) = yt_dl.communicate()
-        
+
       if yt_dl.returncode != 0:
           sys.stderr.write(err)
           raise RuntimeError('Error getting URL.')
+    return url
 
-    assert player in [MPLAYER_MODE,OMXPLAYER_MODE]
-    if player == MPLAYER_MODE:
-        play_url_mplayer(url,novideo)
-    else:
-        play_url_omxplayer(url,audio)
-    
 def play_url_mplayer(url,novideo):
   
     if novideo:
@@ -464,6 +471,11 @@ def play_url_omxplayer(url,audio):
     # fix black X screen after omxplayer playback
     # http://elinux.org/Omxplayer#Black_screen_after_playback
     os.system('xrefresh -display :0')
+
+def play_url_mpv(url, novideo):
+    player = subprocess.Popen(['mpv', '--really-quiet', '--', url],
+            stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    player.wait()
 
 def search(terms):
     def fetch_cb(start, maxresults, ordering):

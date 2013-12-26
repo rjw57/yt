@@ -3,7 +3,7 @@
 
 ``yt`` is a command-line front-end to YouTube which allows you to browse YouTube
 videos and play them directly from the command-line. It uses ``youtube-dl`` and
-``mplayer`` or ``omxplayer`` to actually *play* the videos.
+``mplayer``, ``omxplayer``, or ``mpv`` to actually *play* the videos.
 
 The combination of a text based interface and ``omxplayer`` makes ``yt`` a great
 YouTube client for the Raspberry Pi.
@@ -62,9 +62,12 @@ One line install for the Raspberry Pi
 Dependancies
 ------------
 
-- youtube-dl
-- mplayer or omxplayer
-                        
+Any of
+
+- youtube-dl and mplayer
+- youtube-dl and omxplayer
+- mpv (which uses libquvi)
+
 Common problems
 ---------------
 
