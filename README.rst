@@ -27,7 +27,7 @@ From PyPi (easier!)
 
 ::
 
-    # Install dependancies
+    # Install dependencies
     sudo apt-get install youtube-dl
     # Ensure using latest version of youtube-dl to keep up with YouTube API changes
     sudo youtube-dl -U
@@ -41,7 +41,7 @@ From GitHub
 
 ::
 
-    # Install dependancies
+    # Install dependencies
     sudo apt-get install youtube-dl
     # Ensure using latest version of youtube-dl to keep up with YouTube API changes
     sudo youtube-dl -U
@@ -59,7 +59,7 @@ One line install for the Raspberry Pi
 
     curl -L https://github.com/rjw57/yt/raw/master/tools/install-pi.sh | sh
                         
-Dependancies
+Dependencies
 ------------
 
 Any of
