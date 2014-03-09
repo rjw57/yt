@@ -48,7 +48,7 @@ From GitHub
 
     # Install from GitHub
     sudo apt-get install python-setuptools
-    git checkout git@github.com:rjw57/yt.git
+    git clone https://github.com/rjw57/yt.git
     cd yt
     sudo python setup.py install
 
