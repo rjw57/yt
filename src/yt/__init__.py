@@ -147,6 +147,7 @@ class Ui(object):
                 ('s', 'search'),
                 ('1-9', 'choose'),
                 ('v', 'choose index'),
+                ('d', 'download'),
                 ('u', 'user'),
                 ('n', 'toggle novideo'),
         ]
@@ -281,6 +282,13 @@ class Ui(object):
                         self._play_video(int(s) - 1)
                     except ValueError:
                         pass
+            elif c == ord('d'): # download
+                s = self._input('download number')
+                if s is not None:
+                    try:
+                        self._download_video(int(s) - 1)
+                    except ValueError:
+                        pass
             elif c == ord('u'): # user
                 s = self._input('user')
                 if s is not None and len(s) > 0:
@@ -319,6 +327,15 @@ class Ui(object):
         url = item['player']['default']
         self._show_message('Playing ' + url)
         play_url(url,self._player,self._novideo,self._bandwidth,self._audio)
+
+    def _download_video(self, idx):
+        # idx is 0-based(!)
+        if self._items is None or idx < 0 or idx >= len(self._items):
+            return
+        item = self._items[idx]
+        url = item['player']['default']
+        fo = download_url(url, self._novideo, self._bandwidth)
+        self._stream_message(fo, 'Downloading ' + item['title'])
 
     def _show_video_items(self, items):
         # Get size of window and maximum number of items per page
@@ -382,12 +399,79 @@ class Ui(object):
 
         winw = min(len(s)+2, w)
 
-        mw = curses.newwin(3, winw, (h//2)-1, (w-winw)//2)
+        mw = self._setup_message_window(3, winw)
+        mw.addstr(1,1, truncate(s,winw-2).encode(self._code))
+        mw.refresh()
+
+    def _stream_message(self, fo, title=""):
+        """Take in a file object and continual read it and display resulting
+        output in a window"""
+
+        winh = 9
+
+        (h, w) = self._main_win.getmaxyx()
+        if w < 3 or h < winh:
+            return
+
+        winw = min(max(len(title) + 4, 80), w)
+        mw = self._setup_message_window(winh, winw)
+
+        if title != "":
+            title = " " + title + " "
+            mw.addstr(0, (winw - len(title))//2, title.encode(self._code))
+            mw.refresh()
+
+        status = " Press ctrl-c to cancel "
+        mw.addstr(winh-1, (winw - len(status))//2, status.encode(self._code))
+        mw.refresh()
+
+        line = 1
+        linecontent = ""
+
+        while True:
+            try:
+                ch = fo.stdout.read(1)
+            except KeyboardInterrupt:
+                break
+
+            # If we're done, display close message and stop
+            if ch == '' and fo.poll() != None:
+                close_message = " Press a key to close "
+                mw.addstr(winh-1, (winw - len(close_message))//2, close_message.encode(self._code))
+                mw.refresh()
+                c = self._main_win.getch()
+                break
+
+            # If we didn't encounter a new line or carriage return char,
+            # accumulate our linecontent buffer
+            if ch != "\n" and ch != "\r":
+                linecontent += ch
+                continue
+
+            # Clean out the current line
+            mw.addstr(line, 1, " " * (winw-2))
+
+            # Display our line
+            mw.addstr(line, 1, truncate(linecontent, winw-2).encode(self._code))
+            mw.refresh()
+            linecontent = ""
+
+            # A carriage return should stay on the same line
+            if ord(ch) != 13:
+                line = line + 1
+
+            # Make sure we don't try to output past the window
+            if line > winh-2:
+                line = winh-2
+
+    def _setup_message_window(self, height, width):
+        (h, w) = self._main_win.getmaxyx()
+        mw = curses.newwin(height, width, (h//2)-(height//2)-2, (w-width)//2)
         mw.bkgd(' ', curses.color_pair(5))
         mw.erase()
         mw.border()
-        mw.addstr(1,1, truncate(s,winw-2).encode(self._code))
-        mw.refresh()
+
+        return mw
 
     def _add_table_row(self, data, y, x, w, attr, max_width=None, min_width=4, win=None):
         if win is None:
@@ -419,6 +503,10 @@ def number(n):
     if n < 1000000:
         return '%.1fk' % (n/1000.0,)
     return '%.1fM' % (n//1000000.0,)
+
+def download_url(url,novideo,bandwidth):
+    yt_dl = subprocess.Popen(['youtube-dl', url], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    return yt_dl
 
 def play_url(url,player,novideo,bandwidth,audio):
     assert player in [MPLAYER_MODE,OMXPLAYER_MODE,MPV_MODE]
